@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Restaurant login{% endblock %}
+{% block content %}
+<main class="container narrow">
+  <div class="card">
+    <h1>Restaurant login</h1>
+    <form method="post" class="login-form">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input type="hidden" name="next" value="{{ next }}">
+      <button class="btn" type="submit">Login</button>
+    </form>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Menu QR – Restaurants{% endblock %}
+{% block content %}
+<main class="container">
+  <h1>Menu QR</h1>
+  <p class="muted">Manage items in the <a href="/admin/">admin panel</a>.
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'logout' %}" class="inline">{% csrf_token %}
+        <button class="link-btn" type="submit">Logout ({{ user.username }})</button></form>
+    {% endif %}
+  </p>
+  <ul class="rest-list">
+    {% for r in restaurants %}
+      <li class="card">
+        <div>
+          <strong>{{ r.name }}</strong>
+          <div class="muted">{{ r.tagline }}</div>
+        </div>
+        <div class="actions">
+          <a class="btn" href="{% url 'menu' r.slug %}">View menu</a>
+          <a class="btn btn-outline" href="{% url 'qr_page' r.slug %}">QR code</a>
+          <a class="btn btn-outline" href="{% url 'dashboard' r.slug %}">Orders</a>
+        </div>
+      </li>
+    {% empty %}
+      <li class="card">No restaurants yet. Run <code>python manage.py seed</code> or add one in admin.</li>
+    {% endfor %}
+  </ul>
+</main>
+{% endblock %}

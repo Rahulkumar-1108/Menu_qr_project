@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}QR – {{ restaurant.name }}{% endblock %}
+{% block content %}
+<main class="container qr-wrap">
+  <div class="card qr-card">
+    <h1>{{ restaurant.name }}{% if table %} · Table {{ table }}{% endif %}</h1>
+    <p class="muted">Scan to view the menu &amp; order</p>
+    <img src="{{ qr_src }}" alt="QR code" class="qr-img">
+    <p class="small"><a href="{{ menu_url }}">{{ menu_url }}</a></p>
+
+    <form method="get" class="table-form no-print">
+      <input name="table" value="{{ table }}" placeholder="Table no. (optional)" maxlength="20">
+      <button class="btn btn-sm" type="submit">Make table QR</button>
+    </form>
+
+    <div class="actions no-print">
+      <a class="btn" href="{{ qr_download }}">Download PNG</a>
+      <button class="btn btn-outline" type="button" onclick="window.print()">Print</button>
+      <a class="btn btn-outline" href="{% url 'dashboard' restaurant.slug %}">Orders</a>
+      <a class="btn btn-outline" href="{% url 'home' %}">Back</a>
+    </div>
+    <p class="muted small no-print">Open this page via your LAN IP (e.g. http://192.168.1.5:8000) or your domain so phones can reach the menu.</p>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ restaurant.name }} – Menu{% endblock %}
+{% block content %}
+{% csrf_token %}
+<header class="hero">
+  <h1>{{ restaurant.name }}</h1>
+  <p>{{ restaurant.tagline }}</p>
+  <span id="tableBadge" class="table-badge" hidden></span>
+</header>
+
+<div class="toolbar">
+  <input id="search" type="search" placeholder="Search dishes…" autocomplete="off">
+</div>
+
+<div class="seg" id="dietSeg" role="group" aria-label="Food type">
+  <button class="seg-btn active" data-diet="all" type="button">All</button>
+  <button class="seg-btn" data-diet="veg" type="button"><span class="dot veg"></span> Veg</button>
+  <button class="seg-btn" data-diet="nonveg" type="button"><span class="dot nonveg"></span> Non-Veg</button>
+</div>
+
+<nav class="tabs" id="tabs">
+  <button class="tab active" data-cat="all">All</button>
+  {% for c in categories %}
+    <button class="tab" data-cat="cat-{{ c.id }}">{{ c.name }}</button>
+  {% endfor %}
+</nav>
+
+<main class="container" id="menuApp" data-slug="{{ restaurant.slug }}"
+      data-currency="{{ restaurant.currency }}" data-order-url="{% url 'place_order' restaurant.slug %}">
+  {% for c in categories %}
+  <section class="category" id="cat-{{ c.id }}">
+    <h2>{{ c.name }}</h2>
+    {% for item in c.items.all %}
+    <article class="item {% if not item.is_available %}sold-out{% endif %}"
+             data-id="{{ item.id }}" data-title="{{ item.name }}" data-price="{{ item.price|stringformat:'.2f' }}"
+             data-name="{{ item.name|lower }} {{ item.description|lower }}"
+             data-veg="{{ item.is_veg|yesno:'1,0' }}">
+      {% if item.image %}<img src="{{ item.image.url }}" alt="{{ item.name }}" loading="lazy">{% endif %}
+      <div class="info">
+        <h3><span class="dot {% if item.is_veg %}veg{% else %}nonveg{% endif %}"></span>{{ item.name }}</h3>
+        <p>{{ item.description }}</p>
+        {% if not item.is_available %}<span class="badge">Sold out</span>{% endif %}
+      </div>
+      <div class="side">
+        <div class="price">{{ restaurant.currency }}{{ item.price|floatformat:"-2" }}</div>
+        {% if item.is_available %}<div class="qty-ctl"></div>{% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+  {% empty %}
+    <p class="muted">Menu is empty.</p>
+  {% endfor %}
+  <p id="noResults" class="muted" hidden>No dishes match your filters.</p>
+</main>
+
+<button id="cartBar" class="cart-bar" type="button" hidden>
+  <span><strong id="cartCount">0</strong> items · <span id="cartBarTotal"></span></span>
+  <span>View cart ›</span>
+</button>
+
+<div class="modal" id="cartModal" hidden>
+  <div class="sheet">
+    <div class="sheet-head"><h2>Your order</h2><button id="closeCart" class="x" type="button">×</button></div>
+    <div id="cartLines"></div>
+    <div class="total-row"><span>Total</span><strong id="cartTotal"></strong></div>
+    <div class="fields">
+      <input id="fTable" placeholder="Table number" maxlength="20">
+      <input id="fName" placeholder="Your name (optional)" maxlength="80">
+      <input id="fPhone" placeholder="Phone (optional)" maxlength="20" inputmode="tel">
+      <textarea id="fNote" placeholder="Notes, e.g. less spicy" maxlength="300" rows="2"></textarea>
+    </div>
+    <p id="orderError" class="error" hidden></p>
+    <button id="placeOrder" class="btn btn-block" type="button">Place order</button>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/menu.js' %}"></script>{% endblock %}

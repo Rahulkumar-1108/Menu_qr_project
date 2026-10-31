@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Order #{{ order.id }} – {{ restaurant.name }}{% endblock %}
+{% block content %}
+<main class="container narrow" id="statusApp" data-status="{{ order.status }}"
+      data-feed="{% url 'order_status_json' order.token %}">
+  <div class="card">
+    <h1>Order #{{ order.id }}</h1>
+    <p class="muted">{{ restaurant.name }}{% if order.table_number %} · Table {{ order.table_number }}{% endif %}</p>
+
+    <p class="status-now">Status: <strong id="statusLabel">{{ order.get_status_display }}</strong></p>
+    <ol class="steps" id="steps">
+      <li data-step="new">Received</li>
+      <li data-step="preparing">Preparing</li>
+      <li data-step="ready">Ready</li>
+      <li data-step="served">Served</li>
+    </ol>
+    <p id="cancelMsg" class="error" hidden>This order was cancelled by the restaurant.</p>
+
+    <ul class="summary">
+      {% for i in order.items.all %}
+        <li><span class="dot {% if i.is_veg %}veg{% else %}nonveg{% endif %}"></span>
+          {{ i.quantity }} × {{ i.name }}
+          <span class="right">{{ restaurant.currency }}{{ i.price|floatformat:"-2" }}</span></li>
+      {% endfor %}
+    </ul>
+    <p class="total-row"><span>Total</span><strong>{{ restaurant.currency }}{{ order.total|floatformat:"-2" }}</strong></p>
+    <a class="btn btn-outline" href="{% url 'menu' restaurant.slug %}{% if order.table_number %}?table={{ order.table_number|urlencode }}{% endif %}">Order more</a>
+  </div>
+</main>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/status.js' %}"></script>{% endblock %}

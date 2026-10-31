@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Orders – {{ restaurant.name }}{% endblock %}
+{% block content %}
+{% csrf_token %}
+<header class="dash-head">
+  <h1>{{ restaurant.name }} · Orders</h1>
+  <div class="actions">
+    <label class="toggle"><input type="checkbox" id="soundOn" checked> 🔔 Sound</label>
+    <a class="btn btn-outline btn-sm" href="{% url 'qr_page' restaurant.slug %}">QR codes</a>
+    <form method="post" action="{% url 'logout' %}" class="inline">{% csrf_token %}
+      <button class="btn btn-outline btn-sm" type="submit">Logout</button></form>
+  </div>
+</header>
+
+<div class="tabs tabs-dash">
+  <button class="tab active" data-view="active">Active <span id="activeCount" class="count">0</span></button>
+  <button class="tab" data-view="done">Completed today</button>
+</div>
+
+<main class="container wide" id="dashApp" data-base="{% url 'dashboard' restaurant.slug %}">
+  <div id="orders" class="orders"></div>
+  <p id="emptyMsg" class="muted" hidden>No orders here yet. New orders appear automatically.</p>
+</main>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/dashboard.js' %}"></script>{% endblock %}
